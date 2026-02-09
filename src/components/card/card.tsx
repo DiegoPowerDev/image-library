@@ -354,7 +354,7 @@ export default function Card(props: Props) {
 
       {/* Dialog principal */}
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className="max-w-5xl max-h-[90vh] pr-12">
+        <DialogContent className="max-w-5xl  max-h-[90vh] pr-12">
           <form onSubmit={onSubmit} className="w-full h-full">
             <div className="grid grid-rows-1 grid-cols-[1fr_4fr_4fr] gap-4 items-start h-28">
               <div className="h-full w-full flex gap-2 items-center justify-center">
@@ -644,7 +644,7 @@ export default function Card(props: Props) {
       </Dialog>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-3xl max-h-[90vh] w-fit overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>
               {selectedHistorial?.titulo || "Detalle del historial"}

@@ -1,7 +1,6 @@
 "use client";
 import Calendario from "@/components/calendario/calendario";
 import Sidebar from "@/components/sidebar/sidebar";
-import Table from "@/components/table";
 import { useFireStore } from "@/store/firestore";
 import { useUserStore } from "@/store/userStore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -11,6 +10,8 @@ import { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import PanelAdmin from "@/components/panelAdmin/panelAdmin";
 import Dashboard from "@/components/dashboard/dashboard";
+import Biblioteca from "@/components/biblioteca";
+import Eliminados from "@/components/eliminados";
 
 export default function Page() {
   const loadUserData = useFireStore((s) => s.loadUserData);
@@ -65,6 +66,8 @@ export default function Page() {
     inicio: <Dashboard />,
     Calendario: <Calendario />,
     Panel: <PanelAdmin />,
+    Eliminados: <Eliminados />,
+    Biblioteca: <Biblioteca />,
   };
 
   return (
@@ -78,7 +81,7 @@ export default function Page() {
               "h-full w-full flex flex-col",
             )}
           >
-            {tables[sideOption] ?? <Table />}
+            {tables[sideOption]}
           </div>
         </div>
       )}

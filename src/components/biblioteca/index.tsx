@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import styles from "@/components/styles.module.css";
 import { useEffect, useRef, useState, useMemo, CSSProperties } from "react";
-import Card from "./card/card";
+import Card from "@/components/card/card";
 import {
   IconBrandFacebook,
   IconBrandWordpress,
@@ -32,11 +32,12 @@ import {
 } from "@tabler/icons-react";
 import { useFireStore } from "@/store/firestore";
 import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { Timestamp } from "firebase/firestore";
 import { useUserStore } from "@/store/userStore";
+import Table from "../table";
 
 interface Image {
   id: number;
@@ -58,6 +59,22 @@ interface Image {
     fechaModificacion: Date | string;
   }>;
 }
+
+const meses = [
+  "Todos",
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Septiembre",
+  "Octubre",
+  "Noviembre",
+  "Diciembre",
+];
 
 const seccions = [
   {
@@ -113,23 +130,7 @@ const Campañas = [
   },
 ];
 
-const meses = [
-  "Todos",
-  "Enero",
-  "Febrero",
-  "Marzo",
-  "Abril",
-  "Mayo",
-  "Junio",
-  "Julio",
-  "Agosto",
-  "Septiembre",
-  "Octubre",
-  "Noviembre",
-  "Diciembre",
-];
-
-export default function Table() {
+export default function Biblioteca() {
   const [openForm, setOpenForm] = useState(false);
   const [imagen, setImagen] = useState("");
   const [titulo, setTitulo] = useState("");
@@ -144,13 +145,10 @@ export default function Table() {
   const [filtroMes, setFiltroMes] = useState<string>("Todos");
   const [filtroAño, setFiltroAño] = useState<string>("Todos");
   const [filtroCategoriaLib, setFiltroCategoriaLib] = useState("Todos");
-  const [filtroEstado, setFiltroEstado] = useState("Activo");
   const [filtroCampaña, setFiltroCampaña] = useState("Todos");
-  const user = useUserStore((s) => s.currentUser);
 
   const sideOption = useFireStore((s) => s.sideOption);
   const items = useFireStore((s) => s.items);
-  const isLoadingFromFirestore = useFireStore((s) => s.isLoadingFromFirestore);
   const addImagen = useFireStore((s) => s.addImagen);
   const lastId = useFireStore((s) => s.lastId);
   const email = useFireStore((s) => s.email);
@@ -299,96 +297,19 @@ export default function Table() {
   }, []);
 
   // Optimizar filtrado con useMemo
-  const filteredImages = useMemo(() => {
-    const filtered = items.filter((img: Image) => {
-      const fecha = toDate(img.fechaCreacion);
-      if (!fecha) return false;
-
-      // ===============================
-      // ELIMINADOS
-      // ===============================
-      if (sideOption === "Eliminados") {
-        return img.estado === "eliminado";
-      }
-
-      // ===============================
-      // BIBLIOTECA
-      // ===============================
-      if (sideOption === "Biblioteca") {
-        let matches = true;
-
-        // 🔹 Filtro por MES
-        if (filtroMes !== "Todos") {
-          const mesImagen = fecha.getMonth(); // 0-11
-          const mesSeleccionado = meses.indexOf(filtroMes) - 1;
-          matches = matches && mesImagen === mesSeleccionado;
-        }
-
-        // 🔹 Filtro por AÑO
-        if (filtroAño !== "Todos") {
-          matches = matches && fecha.getFullYear().toString() === filtroAño;
-        }
-
-        // 🔹 Categoría
-        if (filtroCategoriaLib !== "Todos") {
-          matches =
-            matches &&
-            img.categoria.toLowerCase() === filtroCategoriaLib.toLowerCase();
-        }
-
-        // 🔹 Estado
-        if (filtroEstado !== "Todos") {
-          matches =
-            matches && img.estado.toLowerCase() === filtroEstado.toLowerCase();
-        }
-
-        // 🔹 Campaña
-        if (filtroCampaña !== "Todos") {
-          matches =
-            matches &&
-            img.campaña.toLowerCase() === filtroCampaña.toLowerCase();
-        }
-
-        return matches;
-      }
-
-      // ===============================
-      // CAMPAÑAS (NORMAL)
-      // ===============================
-      const matchesEstado = img.estado === "activo";
-      const matchesCategoria =
-        filtroCategoria === "ninguna" || img.categoria === filtroCategoria;
-      const matchesCampaña =
-        tipoCampaña === "ninguna" || img.campaña === tipoCampaña;
-
-      return matchesEstado && matchesCategoria && matchesCampaña;
-    });
-
-    // ===============================
-    // 🔽 ORDENAR POR FECHA (DESC)
-    // ===============================
-    return filtered.sort((a, b) => {
-      const fa = toDate(a.fechaCreacion)?.getTime() ?? 0;
-      const fb = toDate(b.fechaCreacion)?.getTime() ?? 0;
-      return fb - fa; // más reciente primero
-    });
-  }, [
-    items,
-    sideOption,
-    filtroMes,
-    filtroAño,
-    filtroCategoriaLib,
-    filtroEstado,
-    filtroCampaña,
-    filtroCategoria,
-    tipoCampaña,
-  ]);
 
   const headerHeight = useMemo(() => {
     if (sideOption === "campañas") return "h-36";
     if (sideOption === "Biblioteca") return "h-16";
     return "h-16";
   }, [sideOption]);
+
+  const filtros = {
+    filtroMes,
+    filtroAño,
+    filtroCategoriaLib,
+    filtroCampaña,
+  };
 
   return (
     <div
@@ -426,140 +347,75 @@ export default function Table() {
             </div>
           )}
 
-          {sideOption === "campañas" && (
-            <div className="flex gap-2 w-full justify-center overflow-x-auto pb-2">
-              {Campañas.map((campaña, i) => {
-                const IconComponent = campaña.Icono;
-                return (
-                  <button
-                    key={i}
-                    onClick={() => setTipoCampaña(campaña.nombre)}
-                    className={cn(
-                      tipoCampaña === campaña.nombre
-                        ? "bg-black border-white border-2"
-                        : "bg-gray-500 hover:bg-gray-600",
-                      "min-w-36 h-12 rounded text-center flex items-center justify-center hover:scale-105 transition-all duration-200 cursor-pointer gap-2 uppercase",
-                    )}
-                  >
-                    {campaña.nombre}
-                    <IconComponent size={20} />
-                  </button>
-                );
-              })}
+          <div className="flex gap-8 w-full justify-center items-center">
+            <div className="flex gap-2 items-center">
+              <label htmlFor="meses">Mes:</label>
+              <Select value={filtroMes} onValueChange={setFiltroMes}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Mes" />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  {meses.map((mes) => (
+                    <SelectItem key={mes} value={mes}>
+                      {mes}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          )}
 
-          {sideOption === "Biblioteca" && (
-            <div className="flex gap-8 w-full justify-center items-center">
-              <div className="flex gap-2 items-center">
-                <label htmlFor="meses">Mes:</label>
-                <Select value={filtroMes} onValueChange={setFiltroMes}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Mes" />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    {meses.map((mes) => (
-                      <SelectItem key={mes} value={mes}>
-                        {mes}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex gap-2 items-center">
-                <label htmlFor="meses">Categoria:</label>
-                <Select
-                  value={filtroCategoriaLib}
-                  onValueChange={setFiltroCategoriaLib}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Categoría" />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    <SelectItem value="Todos">Todos</SelectItem>
-                    {seccions
-                      .filter((s) => s.nombre !== "ninguna")
-                      .map((s) => (
-                        <SelectItem
-                          key={s.nombre}
-                          value={s.nombre}
-                          className="capitalize"
-                        >
-                          {s.nombre}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex gap-2 items-center">
-                <label htmlFor="meses">Campaña:</label>
-                <Select value={filtroCampaña} onValueChange={setFiltroCampaña}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Campaña" />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    <SelectItem value="Todos">Todos</SelectItem>
-                    {Campañas.filter((c) => c.nombre !== "ninguna").map((c) => (
+            <div className="flex gap-2 items-center">
+              <label htmlFor="meses">Categoria:</label>
+              <Select
+                value={filtroCategoriaLib}
+                onValueChange={setFiltroCategoriaLib}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Categoría" />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  <SelectItem value="Todos">Todos</SelectItem>
+                  {seccions
+                    .filter((s) => s.nombre !== "ninguna")
+                    .map((s) => (
                       <SelectItem
-                        key={c.nombre}
-                        value={c.nombre}
+                        key={s.nombre}
+                        value={s.nombre}
                         className="capitalize"
                       >
-                        {c.nombre}
+                        {s.nombre}
                       </SelectItem>
                     ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                </SelectContent>
+              </Select>
             </div>
-          )}
-        </div>
-      </div>
-      {isLoadingFromFirestore ? (
-        <div className="h-[90vh] flex items-center justify-center">
-          <div className="flex-1 w-full flex items-center justify-center">
-            <div className="w-40 h-40 border-8 border-gray-800/20 border-t-gray-800 rounded-full animate-spin"></div>
+
+            <div className="flex gap-2 items-center">
+              <label htmlFor="meses">Campaña:</label>
+              <Select value={filtroCampaña} onValueChange={setFiltroCampaña}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Campaña" />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  <SelectItem value="Todos">Todos</SelectItem>
+                  {Campañas.filter((c) => c.nombre !== "ninguna").map((c) => (
+                    <SelectItem
+                      key={c.nombre}
+                      value={c.nombre}
+                      className="capitalize"
+                    >
+                      {c.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
-      ) : (
-        <div
-          style={{ "--theme": "gray" } as CSSProperties}
-          className={cn(
-            styles.scrollContainer,
-            " w-full px-4 flex flex-1 justify-center overflow-y-auto",
-          )}
-        >
-          {filteredImages.length != 0 ? (
-            <div className="h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 grid-flow-row auto-cols-fr gap-4">
-              {user?.role != "viewer" && sideOption === "Biblioteca" && (
-                <button
-                  onClick={() => setOpenForm(true)}
-                  className="border-white/40 border-2 border-dotted hover:border-solid w-64 h-64 rounded flex items-center justify-center transition-all duration-300 cursor-pointer hover:bg-white/5 group"
-                >
-                  <IconPlus
-                    color="white"
-                    size={40}
-                    className="group-hover:scale-110 transition-transform"
-                  />
-                </button>
-              )}
+      </div>
 
-              {/* Cards de imágenes */}
-              {filteredImages.map((e) => (
-                <Card key={e.id} image={e} />
-              ))}
-            </div>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-gray-600 select-none">
-                No se encontró elementos
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      <Table newImage={setOpenForm} filtros={filtros} />
+
       <Dialog open={openForm} onOpenChange={setOpenForm}>
         <DialogContent ref={containerRef} className="w-xl">
           <DialogHeader>
