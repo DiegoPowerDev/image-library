@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "title": "Diseño Marketing",
+    "description": "Pagina web para trabajo colaborativo",
+    "authors": [
+      {
+        "name": "Diego Torres",
+        "url": "https://teammarketing.vercel.app"
+      }
+    ],
+    "openGraph": {
+      "title": "Diseño Marketing",
+      "description": "Pagina web para trabajo colaborativo",
+      "url": "https://teammarketing.vercel.app",
+      "siteName": "Diseño Marketing",
+      "images": [
+        {
+          "url": "/favicon.ico",
+          "width": 1200,
+          "height": 630,
+          "alt": "Web logo"
+        }
+      ],
+      "locale": "en_US",
+      "type": "website"
+    }
+  }
+}

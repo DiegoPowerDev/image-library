@@ -1,0 +1,30 @@
+.scrollContainer {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme) transparent;
+}
+
+.notes:focus {
+  outline: 2px solid var(--theme);
+}
+
+/* Chrome, Edge, Safari */
+.scrollContainer::-webkit-scrollbar {
+  height: 10px; /* grosor horizontal */
+}
+
+.scrollContainer::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background-color: #b91c1c; /* color del thumb */
+  border-radius: 10px;
+  border: 2px solid #1e1e1e; /* espacio entre thumb y track */
+}
+
+.scrollContainer::-webkit-scrollbar-thumb:hover {
+  background-color: #dc2626; /* color más claro al pasar el mouse */
+}
