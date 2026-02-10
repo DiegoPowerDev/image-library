@@ -6,7 +6,6 @@ export async function POST(
   { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
-    // Await params en Next.js 15+
     const { userId } = await params;
     console.log("api:", userId);
     if (!userId) {
@@ -15,22 +14,19 @@ export async function POST(
         { status: 400 },
       );
     }
-
-    console.log("✅ Firestore: Documento eliminado");
-    console.log(adminAuth);
-    // try {
-    //   await auth.deleteUser(userId);
-    //   console.log("✅ Auth: Usuario eliminado");
-    // } catch (authError: any) {
-    //   if (authError.code === "auth/user-not-found") {
-    //     console.warn(
-    //       "⚠️ El usuario no existía en Auth, pero se limpió Firestore.",
-    //     );
-    //   } else {
-    //     console.log("error:", authError);
-    //     throw authError;
-    //   }
-    // }
+    try {
+      await adminAuth.deleteUser(userId);
+      console.log("✅ Auth: Usuario eliminado");
+    } catch (authError: any) {
+      if (authError.code === "auth/user-not-found") {
+        console.warn(
+          "⚠️ El usuario no existía en Auth, pero se limpió Firestore.",
+        );
+      } else {
+        console.log("error:", authError);
+        throw authError;
+      }
+    }
     return NextResponse.json({
       success: true,
       message: "Usuario eliminado correctamente",
