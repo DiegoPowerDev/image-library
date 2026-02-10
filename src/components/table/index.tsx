@@ -126,7 +126,7 @@ export default function Table({ newImage, filtros }: Props) {
     return filtered.sort((a, b) => {
       const fa = toDate(a.fechaCreacion)?.getTime() ?? 0;
       const fb = toDate(b.fechaCreacion)?.getTime() ?? 0;
-      return fb - fa; // más reciente primero
+      return fb - fa;
     });
   }, [items, sideOption, filtros]);
 

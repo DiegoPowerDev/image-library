@@ -146,11 +146,6 @@ export default function UserAdminPanel() {
 
     try {
       await deleteUser(userToDelete.id);
-      const res = await fetch(`/api/users/${userToDelete.id}`, {
-        method: "DELETE",
-      });
-      const data = await res.json();
-      console.log(data);
       toast.success(`Usuario ${userToDelete.displayName} eliminado`);
       setDeleteDialogOpen(false);
       setUserToDelete(null);

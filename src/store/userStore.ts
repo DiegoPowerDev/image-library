@@ -139,21 +139,31 @@ export const useUserStore = create<UserState>((set, get) => ({
 
   deleteUser: async (userId: string) => {
     try {
-      // Verificar que no sea el usuario actual
       const currentUser = get().currentUser;
       if (currentUser?.id === userId) {
         throw new Error("No puedes eliminar tu propia cuenta");
       }
 
+      const res = await fetch(`/api/users/${userId}`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const errorHtml = await res.text();
+        console.error("Fallo en el servidor. Respuesta recibida:", errorHtml);
+        throw new Error(
+          `Error del servidor: ${res.status} - Revisa la consola para el HTML.`,
+        );
+      }
+      const data = await res.json();
+      console.log(data);
+
       const userRef = doc(db, "users", userId);
       await deleteDoc(userRef);
-
-      // Actualizar estado local
       set((state) => ({
         users: state.users.filter((u) => u.id !== userId),
       }));
 
-      console.log(`✅ Usuario ${userId} eliminado`);
+      console.log(`Usuario ${userId} eliminado`);
     } catch (error) {
       console.error("❌ Error eliminando usuario:", error);
       throw error;
