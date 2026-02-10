@@ -6,6 +6,7 @@ import { login, resendEmailVerification } from "@/firebase/auth";
 import toast from "react-hot-toast";
 import { DoorOpen, Mails } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
+import Image from "next/image";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
@@ -25,7 +26,7 @@ export default function Login() {
       }
       if (res.error?.code === "email-not-verified") {
         toast.error(
-          "Aun no has confirmado tu correo con el link que se te envió"
+          "Aun no has confirmado tu correo con el link que se te envió",
         );
         setVerify(true);
         setLoading(false);
@@ -39,17 +40,33 @@ export default function Login() {
   };
 
   return (
-    <div className="flex w-full h-full flex-col gap-4">
-      <div className="h-40 flex items-center justify-center">
-        {/* <img
-          src="/"
+    <div className="flex w-full h-full flex-col  ">
+      <div className=" flex items-center justify-center">
+        <Image
+          src="/logo.webp"
           alt="logo"
-          > */}
-        <div>LOGO</div>
+          width={200}
+          height={200}
+          className="object-contain max-w-full"
+        />
       </div>
+      {verify && (
+        <div className="w-full flex justify-center items-center pb-2">
+          <Button
+            onClick={() => {
+              setVerify(false);
+              resendEmailVerification((e) => console.log(e));
+            }}
+            type="button"
+            className="w-3/4 hover:opacity-60 font-bold border-2 border-yellow-400"
+          >
+            Re-enviar confirmación <Mails />
+          </Button>
+        </div>
+      )}
       <form
         onSubmit={handleSubmit}
-        className="w-full flex flex-col items-center justify-center gap-6"
+        className="w-full flex flex-col items-center justify-center gap-2"
       >
         <div className="w-full">
           <label className="font-bold">Correo</label>
@@ -70,7 +87,7 @@ export default function Login() {
           />
         </div>
         <div className="flex flex-col gap-2 w-full justify-center items-center">
-          <div className="w-full flex justify-center items-center">
+          <div className="w-full flex justify-center items-center pt-2">
             <Button
               disabled={loading}
               className=" font-bold w-3/4 hover:opacity-60"
@@ -93,20 +110,6 @@ export default function Login() {
             ¿Olvidaste tu contraseña?
           </div>
         </div>
-        {verify && (
-          <div className="w-full flex justify-center items-center">
-            <Button
-              onClick={() => {
-                setVerify(false);
-                resendEmailVerification((e) => console.log(e));
-              }}
-              type="button"
-              className="w-3/4 hover:opacity-60 font-bold"
-            >
-              Re-enviar confirmación <Mails />
-            </Button>
-          </div>
-        )}
       </form>
     </div>
   );

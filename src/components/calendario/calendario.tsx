@@ -325,13 +325,13 @@ export default function Calendario() {
           </div>
         </div>
       ) : (
-        <div className="px-12 w-full h-screen text-white flex flex-col items-center overflow-x-hidden">
+        <div className=" w-full h-screen text-white flex flex-col items-center overflow-x-hidden">
           {/* Header con Selectores y Filtros */}
-          <div className="w-full space-y-4 mb-4">
-            <div className="flex gap-4 items-center justify-between">
+          <div className="w-full h-16 flex bg-gray-900 items-center justify-center ">
+            <div className="flex gap-4  items-center justify-between">
               <div className="flex gap-4 items-center">
                 <Select onValueChange={(v) => setAño(Number(v))}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[180px] bg-black ext-white font-bold">
                     <SelectValue placeholder={año} />
                   </SelectTrigger>
                   <SelectContent position="popper" className="max-h-none">
@@ -344,7 +344,7 @@ export default function Calendario() {
                 </Select>
 
                 <Select onValueChange={(v) => setMes(meses.indexOf(v))}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[180px] bg-black text-white font-bold">
                     <SelectValue placeholder={meses[mes]} />
                   </SelectTrigger>
                   <SelectContent position="popper" className="max-h-none">
@@ -360,7 +360,7 @@ export default function Calendario() {
           </div>
 
           {/* Días de la semana */}
-          <div className="h-10 grid grid-cols-7 w-full place-content-center">
+          <div className="h-10 grid grid-cols-7 w-full place-content-center px-12">
             {diasSemana.map((d) => (
               <div
                 key={d}
@@ -376,7 +376,7 @@ export default function Calendario() {
             style={{ "--theme": "gray" } as CSSProperties}
             className={cn(
               styles.scrollContainer,
-              "grid grid-cols-7 flex-1 w-full overflow-y-auto",
+              "grid grid-cols-7 flex-1 w-full overflow-y-auto px-12",
             )}
           >
             {/* Espacios vacíos */}
@@ -503,7 +503,7 @@ export default function Calendario() {
                               ? "#FF6467"
                               : "#51A2FF",
                       }}
-                      className={`text-white uppercase p-2 rounded-xl flex items-center justify-center`}
+                      className={`text-white uppercase p-2 rounded flex items-center justify-center`}
                     >
                       {tarea?.estado}
                     </div>
@@ -513,7 +513,11 @@ export default function Calendario() {
 
               <Tabs
                 defaultValue="detalles"
-                className="flex-1  overflow-hidden flex flex-col"
+                style={{ "--theme": "gray" } as CSSProperties}
+                className={cn(
+                  styles.scrollContainer,
+                  "flex-1  overflow-x-hidden overflow-y-auto flex p-4    flex-col",
+                )}
               >
                 <div className="w-full flex justify-end">
                   {!editable && (
@@ -542,7 +546,7 @@ export default function Calendario() {
                 {/* Tab: Detalles */}
                 <TabsContent
                   value="detalles"
-                  className="space-y-4 overflow-hidden flex-1"
+                  className={cn("space-y-4  flex-1")}
                 >
                   <div
                     onClick={() => console.log(tarea)}
@@ -600,7 +604,7 @@ export default function Calendario() {
                           className={cn(
                             "h-[30vh]",
                             styles.scrollContainer,
-                            "w-full   flex justify-center border",
+                            "w-full   flex justify-center border ",
                           )}
                         >
                           {editable ? (
@@ -688,12 +692,14 @@ export default function Calendario() {
                               Descripción
                             </label>
                             <textarea
-                              rows={4}
+                              style={{ "--theme": "gray" } as CSSProperties}
+                              rows={3}
                               value={descripcion}
                               disabled={!editable}
                               onChange={(e) => setDescripcion(e.target.value)}
                               placeholder="Descripción de la tarea"
                               className={cn(
+                                styles.scrollContainer,
                                 !editable
                                   ? "border-transparent opacity-50"
                                   : "mt-1  border-white border rounded-lg p-2",
@@ -734,7 +740,7 @@ export default function Calendario() {
                       <div className="flex justify-end gap-2 pt-4">
                         {modoEdicion && editable && (
                           <AlertDialog>
-                            <AlertDialogTrigger className=" bg-red-500 flex w-16 gap-4 items-center justify-center rounded-xl p-2 group-hover:opacity-100 transition-opacity">
+                            <AlertDialogTrigger className=" bg-red-500 flex w-16 gap-4 items-center justify-center rounded p-2 group-hover:opacity-100 transition-opacity">
                               <IconTrash size={18} />
                             </AlertDialogTrigger>
                             <AlertDialogContent className="bg-black text-white">
@@ -838,7 +844,7 @@ export default function Calendario() {
             open={openHistorialDialog}
             onOpenChange={setOpenHistorialDialog}
           >
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+            <DialogContent className="max-w-3xl w-fit max-h-[90vh] overflow-hidden flex flex-col">
               <DialogHeader>
                 <DialogTitle>
                   {selectedHistorial?.titulo || "Detalle del historial"}

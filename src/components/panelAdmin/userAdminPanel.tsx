@@ -270,8 +270,8 @@ export default function UserAdminPanel() {
       {/* Tabla de usuarios */}
       <div className="bg-gray-900 rounded-lg overflow-hidden">
         <Table>
-          <TableHeader>
-            <TableRow>
+          <TableHeader className="">
+            <TableRow className="hover:bg-transparent">
               <TableHead className="text-white">Usuario</TableHead>
               <TableHead className="text-white">Email</TableHead>
               <TableHead className="text-white">Rol</TableHead>
@@ -285,7 +285,7 @@ export default function UserAdminPanel() {
               <TableRow>
                 <TableCell
                   colSpan={6}
-                  className="text-center py-8 text-gray-400"
+                  className="text-center p-4 text-gray-400"
                 >
                   No se encontraron usuarios
                 </TableCell>
@@ -486,7 +486,7 @@ export default function UserAdminPanel() {
 
       {/* Dialog de confirmación de eliminación */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-black border-2 border-red-500 text-red-500">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -496,10 +496,12 @@ export default function UserAdminPanel() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer">
+              Cancelar
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
-              className="bg-red-500 hover:bg-red-600"
+              className="bg-red-500 hover:bg-red-600 cursor-pointer"
             >
               Eliminar
             </AlertDialogAction>

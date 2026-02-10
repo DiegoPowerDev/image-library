@@ -80,6 +80,7 @@ interface CounterState {
   loadUserData: () => Unsubscribe | void;
   deleteImagen: (id: number) => Promise<void>;
   restoreImagen: (id: number) => Promise<void>;
+  destroyImagen: (id: number) => Promise<void>;
 }
 
 export const useFireStore = create<CounterState>((set, get) => ({
@@ -95,7 +96,7 @@ export const useFireStore = create<CounterState>((set, get) => ({
   setUid: (uid: string | null) => set({ uid }),
   items: [],
   mode: "tools",
-  sideOption: "inicio",
+  sideOption: "Biblioteca",
   menu: true,
   isLoadingFromFirestore: true,
 
@@ -122,11 +123,11 @@ export const useFireStore = create<CounterState>((set, get) => ({
                   h.fechaModificacion?.toDate?.() ||
                   new Date(h.fechaModificacion),
               })),
-            })
+            }),
           );
 
           const itemsSorted = [...itemsWithDates].sort(
-            (a: Image, b: Image) => b.id - a.id
+            (a: Image, b: Image) => b.id - a.id,
           );
 
           set({
@@ -153,7 +154,7 @@ export const useFireStore = create<CounterState>((set, get) => ({
           isLoadingFromFirestore: false,
           loading: false,
         });
-      }
+      },
     );
 
     return unsubscribe;
@@ -241,7 +242,7 @@ export const useFireStore = create<CounterState>((set, get) => ({
 
     if (data.nombre && data.nombre !== imagenActual.nombre) {
       cambios.push(
-        `Título cambiado: Anterior: "${imagenActual.nombre}" Nuevo: "${data.nombre}"`
+        `Título cambiado: Anterior: "${imagenActual.nombre}" Nuevo: "${data.nombre}"`,
       );
       cambiosDetallados.push({
         campo: "nombre",
@@ -252,7 +253,7 @@ export const useFireStore = create<CounterState>((set, get) => ({
 
     if (data.descripcion && data.descripcion !== imagenActual.descripcion) {
       cambios.push(
-        `Descripción cambiada: Anterior: "${imagenActual.descripcion}" Nuevo: "${data.descripcion}"`
+        `Descripción cambiada: Anterior: "${imagenActual.descripcion}" Nuevo: "${data.descripcion}"`,
       );
       cambiosDetallados.push({
         campo: "descripcion",
@@ -263,7 +264,7 @@ export const useFireStore = create<CounterState>((set, get) => ({
 
     if (data.categoria && data.categoria !== imagenActual.categoria) {
       cambios.push(
-        `Categoría cambiada: Anterior: "${imagenActual.categoria}" Nuevo: "${data.categoria}"`
+        `Categoría cambiada: Anterior: "${imagenActual.categoria}" Nuevo: "${data.categoria}"`,
       );
       cambiosDetallados.push({
         campo: "categoria",
@@ -274,7 +275,7 @@ export const useFireStore = create<CounterState>((set, get) => ({
 
     if (data.campaña && data.campaña !== imagenActual.campaña) {
       cambios.push(
-        `Campaña cambiada: Anterior: "${imagenActual.campaña}" Nuevo: "${data.campaña}"`
+        `Campaña cambiada: Anterior: "${imagenActual.campaña}" Nuevo: "${data.campaña}"`,
       );
       cambiosDetallados.push({
         campo: "campaña",
@@ -285,7 +286,7 @@ export const useFireStore = create<CounterState>((set, get) => ({
 
     if (data.url && data.url !== imagenActual.url) {
       cambios.push(
-        `Imagen reemplazada:\n Anterior: ${imagenActual.url}\n Nuevo: ${data.url}`
+        `Imagen reemplazada:\n Anterior: ${imagenActual.url}\n Nuevo: ${data.url}`,
       );
       cambiosDetallados.push({
         campo: "url",
@@ -358,7 +359,7 @@ export const useFireStore = create<CounterState>((set, get) => ({
             estado: "eliminado",
             historial: [...img.historial, nuevoHistorial],
           }
-        : img
+        : img,
     );
 
     set({ items: nuevosItems });
@@ -386,9 +387,22 @@ export const useFireStore = create<CounterState>((set, get) => ({
             estado: "activo",
             historial: [...img.historial, nuevoHistorial],
           }
-        : img
+        : img,
     );
     set({ items: nuevosItems });
+    await get().saveToFirestore();
+  },
+  destroyImagen: async (id: number) => {
+    const state = get();
+    const nuevosItems = state.items.filter((img) => img.id !== id);
+    set({ items: nuevosItems });
+    await fetch("/api/deleteImages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    });
     await get().saveToFirestore();
   },
 

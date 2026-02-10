@@ -29,8 +29,8 @@ export default function Home() {
             Registro
           </Button>
         </div>
-        <div className="w-1/3">
-          <div className="border-2 rounded-xl border-white p-20 h-[500px]">
+        <div className="max-w-1/3">
+          <div className="border-2 rounded-xl border-white p-4 px-20 h-[500px]">
             {page === "login" && <Login />}
             {page === "register" && <Register />}
           </div>

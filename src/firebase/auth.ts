@@ -6,7 +6,15 @@ import {
   sendEmailVerification,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { doc, setDoc, getFirestore } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getFirestore,
+  getDocs,
+  collection,
+  query,
+  limit,
+} from "firebase/firestore";
 import { auth } from "@/firebase/config";
 import app from "@/firebase/config";
 
@@ -15,13 +23,13 @@ const db = getFirestore(app);
 export const login = async (
   email: string,
   password: string,
-  callback: (result: { success: boolean; user?: any; error?: any }) => void
+  callback: (result: { success: boolean; user?: any; error?: any }) => void,
 ) => {
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email,
-      password
+      password,
     );
     if (!userCredential.user.emailVerified) {
       return callback({
@@ -37,7 +45,7 @@ export const login = async (
         {
           lastLogin: new Date(),
         },
-        { merge: true }
+        { merge: true },
       );
     } catch (error) {
       console.error("Error actualizando lastLogin:", error);
@@ -52,29 +60,30 @@ export const login = async (
 export const register = async (
   email: string,
   password: string,
-  displayName?: string
+  displayName?: string,
 ) => {
   try {
-    // Crear usuario en Firebase Auth
+    const usersRef = collection(db, "users");
+    const firstUserQuery = query(usersRef, limit(1));
+    const querySnapshot = await getDocs(firstUserQuery);
+
+    const isFirstUser = querySnapshot.empty;
+
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
-      password
+      password,
     );
 
-    // Crear documento en Firestore
     await setDoc(doc(db, "users", userCredential.user.uid), {
       email: email,
       displayName: displayName || email.split("@")[0],
-      role: "viewer", // Rol por defecto
+      role: isFirstUser ? "admin" : "viewer",
       status: "active",
       createdAt: new Date(),
       lastLogin: null,
     });
 
-    console.log("✅ Usuario creado en Firestore:", userCredential.user.uid);
-
-    // Enviar email de verificación
     await sendEmailVerification(userCredential.user);
 
     return { success: true, user: userCredential.user };
@@ -101,7 +110,7 @@ export const onAuthChange = (callback: (user: any) => void) => {
 };
 
 export const resendEmailVerification = async (
-  callback: (result: { success: boolean; error?: any }) => void
+  callback: (result: { success: boolean; error?: any }) => void,
 ) => {
   try {
     if (!auth.currentUser) {
@@ -118,7 +127,7 @@ export const resendEmailVerification = async (
 
 export const resetPassword = async (
   email: string,
-  callback: (result: { success: boolean; error?: any }) => void
+  callback: (result: { success: boolean; error?: any }) => void,
 ) => {
   try {
     await sendPasswordResetEmail(auth, email);

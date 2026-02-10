@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import styles from "@/components/styles.module.css";
+import { CSSProperties, useState } from "react";
 import { IconDatabase, IconUsers } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 
@@ -10,8 +11,8 @@ import BackupPanel from "./backupPanel";
 export default function PanelAdmin() {
   const [tab, setTab] = useState("users");
   return (
-    <div className="w-full h-full p-6 space-y-6 flex flex-col bg-black text-white 2xl:px-40">
-      <div className="grid w-full grid-cols-2 max-w-md gap-4">
+    <div className="w-full h-full  flex flex-col bg-black text-white 2xl:px-40">
+      <div className="flex w-full h-16 items-center p-6 gap-4 bg-gray-900">
         <Button
           variant="ghost"
           onClick={() => setTab("users")}
@@ -36,8 +37,15 @@ export default function PanelAdmin() {
           Backups
         </Button>
       </div>
-
-      {tab === "users" ? <UserAdminPanel /> : <BackupPanel />}
+      <div
+        style={{ "--theme": "gray" } as CSSProperties}
+        className={cn(
+          styles.scrollContainer,
+          "flex-1 w-full overflow-y-auto p-8",
+        )}
+      >
+        {tab === "users" ? <UserAdminPanel /> : <BackupPanel />}
+      </div>
     </div>
   );
 }

@@ -165,10 +165,8 @@ export default function Table({ newImage, filtros }: Props) {
             ))}
           </div>
           {filteredImages.length === 0 && sideOption != "Biblioteca" && (
-            <div className="h-[90vh] flex items-center justify-center">
-              <div className="flex-1 w-full text-white flex justify-center items-center">
-                No se encontró imagenes
-              </div>
+            <div className="flex-1 w-full h-full text-gray-400 flex justify-center items-center select-none">
+              No se encontró imagenes
             </div>
           )}
         </div>

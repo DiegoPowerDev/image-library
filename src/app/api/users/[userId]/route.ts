@@ -1,9 +1,9 @@
-// app/api/users/[userId]/route.ts
-import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
-
+import { NextRequest, NextResponse } from "next/server";
+const auth = getAuth();
+const db = getFirestore();
 if (!getApps().length) {
   try {
     const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -26,36 +26,36 @@ if (!getApps().length) {
     throw error;
   }
 }
-
-const auth = getAuth();
-const db = getFirestore();
-
-// DELETE /api/users/[userId]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     // Await params en Next.js 15+
     const { userId } = await params;
-
+    console.log("api:", userId);
     if (!userId) {
       return NextResponse.json(
         { error: "userId es requerido" },
-        { status: 400 }
+        { status: 400 },
       );
     }
-
-    console.log("🗑️ Eliminando usuario:", userId);
-
-    // Eliminar de Firebase Auth
-    await auth.deleteUser(userId);
-    console.log("✅ Usuario eliminado de Firebase Auth");
-
-    // Eliminar de Firestore
     await db.collection("users").doc(userId).delete();
-    console.log("✅ Usuario eliminado de Firestore");
+    console.log("✅ Firestore: Documento eliminado");
 
+    try {
+      await auth.deleteUser(userId);
+      console.log("✅ Auth: Usuario eliminado");
+    } catch (authError: any) {
+      if (authError.code === "auth/user-not-found") {
+        console.warn(
+          "⚠️ El usuario no existía en Auth, pero se limpió Firestore.",
+        );
+      } else {
+        console.log("error:", authError);
+        throw authError;
+      }
+    }
     return NextResponse.json({
       success: true,
       message: "Usuario eliminado correctamente",
@@ -64,7 +64,7 @@ export async function DELETE(
     console.error("❌ Error eliminando usuario:", error);
     return NextResponse.json(
       { error: error.message || "Error al eliminar usuario" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

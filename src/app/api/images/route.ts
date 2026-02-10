@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     if (!file || !id) {
       return NextResponse.json(
         { error: "File or id missing" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
-        }
+        },
       );
 
       stream.end(buffer);
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     console.error("POST upload error:", error);
     return NextResponse.json(
       { error: "Error replacing image" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

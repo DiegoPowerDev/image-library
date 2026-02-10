@@ -39,51 +39,39 @@ export default function Sidebar() {
       <div
         className={cn(
           !menu && "justify-center",
-          "bg-gray-500 truncate  hover:bg-gray-700 text-white max-h-16 items-center p-4 w-full font-bold flex gap-2 duration-200 cursor-pointer",
+          "bg-gray-500 truncate  hover:bg-gray-700 text-white h-16 items-center p-4 w-full font-bold flex gap-2 duration-200 cursor-pointer",
         )}
       >
         <IconUser size={30} />
-        {menu &&
-          `Hola ${
-            user?.displayName.toUpperCase() ||
-            email?.slice(0, email.indexOf("@"))
-          }`}
         <div
           onClick={() => {
             logout();
             setUid(null);
           }}
+          className="hover:scale-125 duration-200"
         >
           <IconDoor size={30} />
         </div>
+        {menu &&
+          `Hola ${
+            user?.displayName.toUpperCase() ||
+            email?.slice(0, email.indexOf("@"))
+          }`}
       </div>
       <div>
         <div className="flex flex-col items-center justify-center  overflow-hidden">
           <div
-            onClick={() => setSideOption("inicio")}
+            onClick={() => setSideOption("Biblioteca")}
             className={cn(
               !menu && "justify-center",
-              sideOption === "inicio"
+              sideOption === "Biblioteca"
                 ? "bg-black "
-                : "bg-gray-500 hover:bg-gray-900",
+                : "bg-gray-500 hover:bg-gray-700",
               "text-white truncate max-h-16 items-center p-4 w-full font-bold flex gap-2 duration-200 cursor-pointer",
             )}
           >
-            <IconHome size={30} />
-            {menu && "Inicio"}
-          </div>
-          <div
-            onClick={() => setSideOption("campañas")}
-            className={cn(
-              !menu && "justify-center",
-              sideOption === "campañas"
-                ? "bg-black "
-                : "bg-gray-500 hover:bg-gray-700",
-              "text-white max-h-16 truncate items-center p-4 w-full font-bold flex gap-2 duration-200 cursor-pointer",
-            )}
-          >
-            <IconAdjustments size={30} />
-            {menu && "Campañas"}
+            <IconBooks size={30} />
+            {menu && "Biblioteca"}
           </div>
 
           <div
@@ -99,19 +87,7 @@ export default function Sidebar() {
             <IconCalendar size={30} />
             {menu && "Calendario"}
           </div>
-          <div
-            onClick={() => setSideOption("Biblioteca")}
-            className={cn(
-              !menu && "justify-center",
-              sideOption === "Biblioteca"
-                ? "bg-black "
-                : "bg-gray-500 hover:bg-gray-700",
-              "text-white truncate max-h-16 items-center p-4 w-full font-bold flex gap-2 duration-200 cursor-pointer",
-            )}
-          >
-            <IconBooks size={30} />
-            {menu && "Biblioteca"}
-          </div>
+
           <div
             onClick={() => setSideOption("Eliminados")}
             className={cn(

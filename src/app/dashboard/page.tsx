@@ -9,7 +9,6 @@ import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import PanelAdmin from "@/components/panelAdmin/panelAdmin";
-import Dashboard from "@/components/dashboard/dashboard";
 import Biblioteca from "@/components/biblioteca";
 import Eliminados from "@/components/eliminados";
 
@@ -63,7 +62,6 @@ export default function Page() {
   }, [router, loadUserData, setUid]);
 
   const tables: Record<string, React.ReactElement> = {
-    inicio: <Dashboard />,
     Calendario: <Calendario />,
     Panel: <PanelAdmin />,
     Eliminados: <Eliminados />,

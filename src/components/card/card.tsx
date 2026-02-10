@@ -1,5 +1,16 @@
 "use client";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -20,6 +31,7 @@ import {
   IconDownload,
   IconPencil,
   IconPlus,
+  IconTrash,
   IconX,
 } from "@tabler/icons-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -92,6 +104,7 @@ export default function Card(props: Props) {
   const sideOption = useFireStore((s) => s.sideOption);
   const deleteImagen = useFireStore((s) => s.deleteImagen);
   const restoreImagen = useFireStore((s) => s.restoreImagen);
+  const destroyImagen = useFireStore((s) => s.destroyImagen);
   const user = useUserStore((s) => s.currentUser);
   const email = useFireStore((s) => s.email);
   const formatearFecha = (fecha: Fecha): string => {
@@ -259,6 +272,22 @@ export default function Card(props: Props) {
     fileRef.current = null;
   };
 
+  const destroy = (id: number) => {
+    destroyImagen(id);
+    toast.success("IMAGEN ELIMINADA PERMANENTEMENTE", {
+      style: {
+        border: "1px solid red",
+        color: "red",
+        textAlign: "center",
+        background: "black",
+      },
+      iconTheme: {
+        primary: "red",
+        secondary: "black",
+      },
+    });
+  };
+
   useEffect(() => {
     if (!openDialog) {
       cancelEdit();
@@ -369,7 +398,7 @@ export default function Card(props: Props) {
                       </div>
                     ) : (
                       <div className="flex flex-col items-center justify-between gap-2">
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 w-full justify-center">
                           <Button
                             type="submit"
                             variant="outline"
@@ -406,11 +435,18 @@ export default function Card(props: Props) {
                             image.estado === "activo"
                               ? "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60"
                               : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-                            "h-9 px-4 py-2 has-[>svg]:px-3",
+                            "h-9 w-full px-4 py-2 has-[>svg]:px-3",
                             "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer",
                           )}
                         >
-                          {image.estado === "activo" ? "Eliminar" : "Restaurar"}
+                          {image.estado === "activo" ? (
+                            <>
+                              Papelera
+                              <IconTrash />
+                            </>
+                          ) : (
+                            "Restaurar"
+                          )}
                         </div>
                       </div>
                     )}
@@ -478,6 +514,7 @@ export default function Card(props: Props) {
                       </div>
                     )}
                   </div>
+
                   <div className="flex items-center gap-2">
                     <span>Campaña:</span>
                     {editable ? (
@@ -509,6 +546,37 @@ export default function Card(props: Props) {
                   <span className="p-2 border-2 font-bold rounded-xl bg-white text-black">
                     {image.autor}
                   </span>
+                  {image.estado === "eliminado" && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" className="px-4">
+                          ELIMINAR <IconX />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-black border-2 border-red-500 text-red-500">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Alerta esta acción es irreversible
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="text-white">
+                            La imagen se eliminará permanentemente de nuestros
+                            servidores
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="px-6 text-black hover:text-white hover:bg-black">
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => destroy(image.id)}
+                            className="px-6 bg-red-500 hover:bg-red-800 border  font-bold"
+                          >
+                            ELIMINAR
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                 </div>
               </div>
             </div>

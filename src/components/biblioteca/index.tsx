@@ -314,7 +314,7 @@ export default function Biblioteca() {
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 pt-2 w-full  items-center transition-all duration-300 h-full",
+        "flex flex-col gap-4 w-full  items-center transition-all duration-300 h-full",
       )}
     >
       <div
@@ -323,7 +323,7 @@ export default function Biblioteca() {
           "sticky w-full bg-black text-white justify-center transition-all duration-300",
         )}
       >
-        <div className="h-full flex flex-col w-full gap-2 bg-black text-white justify-center px-4">
+        <div className="h-full flex flex-col w-full gap-2 bg-gray-900 text-white justify-center px-4">
           {sideOption !== "Biblioteca" && sideOption !== "Eliminados" && (
             <div className="flex gap-2 w-full justify-center">
               {seccions.map((e, i) => {
@@ -347,11 +347,11 @@ export default function Biblioteca() {
             </div>
           )}
 
-          <div className="flex gap-8 w-full justify-center items-center">
+          <div className="flex gap-8 w-full justify-center items-center ">
             <div className="flex gap-2 items-center">
               <label htmlFor="meses">Mes:</label>
               <Select value={filtroMes} onValueChange={setFiltroMes}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px] bg-black">
                   <SelectValue placeholder="Mes" />
                 </SelectTrigger>
                 <SelectContent position="popper">
@@ -370,7 +370,7 @@ export default function Biblioteca() {
                 value={filtroCategoriaLib}
                 onValueChange={setFiltroCategoriaLib}
               >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px] bg-black">
                   <SelectValue placeholder="Categoría" />
                 </SelectTrigger>
                 <SelectContent position="popper">
@@ -393,7 +393,7 @@ export default function Biblioteca() {
             <div className="flex gap-2 items-center">
               <label htmlFor="meses">Campaña:</label>
               <Select value={filtroCampaña} onValueChange={setFiltroCampaña}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px] bg-black bg-black">
                   <SelectValue placeholder="Campaña" />
                 </SelectTrigger>
                 <SelectContent position="popper">
