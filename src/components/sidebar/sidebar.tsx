@@ -42,7 +42,6 @@ export default function Sidebar() {
           "bg-gray-500 truncate  hover:bg-gray-700 text-white h-16 items-center p-4 w-full font-bold flex gap-2 duration-200 cursor-pointer",
         )}
       >
-        <IconUser size={30} />
         <div
           onClick={() => {
             logout();
