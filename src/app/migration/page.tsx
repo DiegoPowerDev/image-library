@@ -35,7 +35,7 @@ export default function MigrationPage() {
       if (userDoc.exists()) {
         const data = userDoc.data();
         setStatus(
-          `El documento ya existe. Rol: ${data.role}, Estado: ${data.status}`
+          `El documento ya existe. Rol: ${data.role}, Estado: ${data.status}`,
         );
         toast.success("El documento ya existe");
         return;
@@ -168,7 +168,7 @@ export default function MigrationPage() {
           </div>
           <div className="space-y-2 text-sm text-gray-300">
             <p>
-              Esta página crea documentos en la colección{" "}
+              Esta página crea documentos en la colección
               <code className="bg-gray-800 px-1 rounded">users/{`{uid}`}</code>
             </p>
             <p>Estructura del documento:</p>
