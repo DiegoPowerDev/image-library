@@ -46,6 +46,7 @@ import {
   IconFilter,
   IconX,
   IconDeviceFloppy,
+  IconPlus,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
@@ -92,6 +93,15 @@ const STATUS = {
 };
 
 export default function UserAdminPanel() {
+  const [createDialog, setCreateDialog] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newRole, setNewRole] = useState<"admin" | "viewer" | "editor">(
+    "viewer",
+  );
+  const [newArea, setNewArea] = useState("");
+
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -107,6 +117,7 @@ export default function UserAdminPanel() {
   const loadUsers = useUserStore((s) => s.loadUsers);
   const updateUser = useUserStore((s) => s.updateUser);
   const toggleUserStatus = useUserStore((s) => s.toggleUserStatus);
+  const createUser = useUserStore((s) => s.createUser);
   const deleteUser = useUserStore((s) => s.deleteUser);
   const currentUser = useUserStore((s) => s.currentUser);
 
@@ -128,6 +139,17 @@ export default function UserAdminPanel() {
       return matchesSearch && matchesRole && matchesStatus;
     });
   }, [users, searchTerm, roleFilter, statusFilter]);
+
+  const createNewUser = async () => {
+    try {
+      await createUser(newEmail, newPassword, newName, newRole, newArea);
+      toast.success("Usuario creado");
+      setCreateDialog(false);
+    } catch (error) {
+      toast.error("Error al crear usuario");
+      console.error(error);
+    }
+  };
 
   const handleEditUser = (user: User) => {
     setSelectedUser(user);
@@ -203,6 +225,10 @@ export default function UserAdminPanel() {
             {filteredUsers.length} de {users.length} usuarios
           </p>
         </div>
+        <Button onClick={() => setCreateDialog(true)}>
+          <IconPlus />
+          Nuevo Usuario
+        </Button>
       </div>
 
       {/* Filtros */}
@@ -382,6 +408,100 @@ export default function UserAdminPanel() {
           </TableBody>
         </Table>
       </div>
+
+      {/* DIALOG DE CREACIÓN DE USUARIO*/}
+
+      <Dialog open={createDialog} onOpenChange={setCreateDialog}>
+        <DialogContent className="w-2/6">
+          <DialogHeader>
+            <DialogTitle>Nuevo Usuario</DialogTitle>
+            <DialogDescription>Creación de Usuario</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email</label>
+              <Input
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Nombre</label>
+              <Input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Contraseña</label>
+              <Input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+
+            <div className="flex gap-2 w-full justify-center">
+              <div className="flex flex-col  gap-2">
+                <span className="flex items-center">
+                  <b>Area: </b>
+                </span>
+                <Input
+                  value={newArea}
+                  onChange={(e) => setNewArea(e.target.value)}
+                  placeholder={selectedUser?.area}
+                  className="uppercase"
+                />
+              </div>
+              <div className="flex flex-col  gap-2">
+                <label className="flex items-center">Rol</label>
+                <Select
+                  value={newRole}
+                  onValueChange={(value: "admin" | "editor" | "viewer") => {
+                    setNewRole(value);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar rol" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">
+                      <div className="flex items-center gap-2">
+                        <IconShield size={16} />
+                        Administrador
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="editor">
+                      <div className="flex items-center gap-2">
+                        <IconUserEdit size={16} />
+                        Editor
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="viewer">
+                      <div className="flex items-center gap-2">
+                        <IconUserCheck size={16} />
+                        Visualizador
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <div className="w-full flex justify-center">
+            <Button
+              className="gap-2 flex w-40"
+              onClick={() => {
+                createNewUser();
+              }}
+            >
+              Guardar <IconDeviceFloppy />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog de edición */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>

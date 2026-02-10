@@ -8,6 +8,8 @@ import {
   onSnapshot,
   query,
   orderBy,
+  serverTimestamp,
+  setDoc,
 } from "firebase/firestore";
 import app from "@/firebase/config";
 import { getAuth } from "firebase/auth";
@@ -30,6 +32,13 @@ interface UserState {
   currentUser: User | null;
   loading: boolean;
   loadUsers: () => void;
+  createUser: (
+    email: string,
+    password: string,
+    displayName: string,
+    rol: "admin" | "editor" | "viewer",
+    area: string,
+  ) => Promise<{ success: boolean }>;
   updateUser: (
     userId: string,
     newRole: "admin" | "editor" | "viewer",
@@ -83,6 +92,38 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     return unsubscribe;
   },
+  createUser: async (email, password, displayName, rol, area) => {
+    try {
+      const res = await fetch("/api/create-users", {
+        method: "POST",
+        body: JSON.stringify({ email, password, displayName }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Error al crear cuenta en Auth");
+      }
+      const { uid } = await res.json();
+      const userRef = doc(db, "users", uid);
+      const userData = {
+        id: uid,
+        email,
+        displayName: displayName || email.split("@")[0],
+        role: rol || "viewer",
+        area: area || "administrativo",
+        status: "active",
+        createdAt: new Date(),
+        lastLogin: null,
+      };
+      await setDoc(userRef, userData);
+
+      console.log("✅ Proceso de creación completado para:", uid);
+      return { success: true };
+    } catch (error: any) {
+      console.error("❌ Error en createUser store:", error);
+      throw error;
+    }
+  },
 
   updateUser: async (
     userId: string,
@@ -114,11 +155,10 @@ export const useUserStore = create<UserState>((set, get) => ({
     try {
       const user = get().users.find((u) => u.id === userId);
       if (!user) throw new Error("Usuario no encontrado");
-      const res = await fetch(`/api/users`, {
+      await fetch(`/api/users`, {
         method: "POST",
         body: JSON.stringify({ userId: userId }),
       });
-      console.log(res);
 
       const newStatus = user.status === "active" ? "disabled" : "active";
       const userRef = doc(db, "users", userId);
@@ -128,7 +168,6 @@ export const useUserStore = create<UserState>((set, get) => ({
         updatedAt: new Date(),
       });
 
-      // Actualizar estado local
       set((state) => ({
         users: state.users.map((u) =>
           u.id === userId ? { ...u, status: newStatus } : u,
