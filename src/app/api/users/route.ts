@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
+import { adminDb, adminAuth } from "@/lib/firebase-admin";
 
 if (!getApps().length) {
   try {
@@ -28,7 +28,6 @@ if (!getApps().length) {
   }
 }
 
-const auth = getAuth();
 const db = getFirestore();
 
 export async function POST(request: NextRequest) {
@@ -38,12 +37,12 @@ export async function POST(request: NextRequest) {
     if (!userId || !role) {
       return NextResponse.json(
         { error: "userId y role son requeridos" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Actualizar custom claims
-    await auth.setCustomUserClaims(userId, { role });
+    await adminAuth.setCustomUserClaims(userId, { role });
 
     // Actualizar en Firestore
     await db.collection("users").doc(userId).update({
@@ -59,7 +58,7 @@ export async function POST(request: NextRequest) {
     console.error("Error updating role:", error);
     return NextResponse.json(
       { error: error.message || "Error al actualizar rol" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -72,7 +71,7 @@ export async function PATCH(request: NextRequest) {
     if (!userId) {
       return NextResponse.json(
         { error: "userId es requerido" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -83,16 +82,16 @@ export async function PATCH(request: NextRequest) {
     if (updates.disabled !== undefined) authUpdates.disabled = updates.disabled;
 
     if (Object.keys(authUpdates).length > 0) {
-      await auth.updateUser(userId, authUpdates);
+      await adminAuth.updateUser(userId, authUpdates);
     }
 
     // Actualizar custom claims si cambia el rol
     if (updates.role) {
-      await auth.setCustomUserClaims(userId, { role: updates.role });
+      await adminAuth.setCustomUserClaims(userId, { role: updates.role });
     }
 
     // Actualizar en Firestore
-    await db
+    await adminDb
       .collection("users")
       .doc(userId)
       .update({
@@ -108,7 +107,7 @@ export async function PATCH(request: NextRequest) {
     console.error("Error updating user:", error);
     return NextResponse.json(
       { error: error.message || "Error al actualizar usuario" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

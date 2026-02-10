@@ -1,6 +1,5 @@
-import { getAuth } from "firebase-admin/auth";
+import { adminAuth } from "@/lib/firebase-admin"; // Importación corregida
 import { NextRequest, NextResponse } from "next/server";
-const auth = getAuth();
 
 export async function POST(
   request: NextRequest,
@@ -18,7 +17,7 @@ export async function POST(
     }
 
     console.log("✅ Firestore: Documento eliminado");
-    console.log(auth);
+    console.log(adminAuth);
     // try {
     //   await auth.deleteUser(userId);
     //   console.log("✅ Auth: Usuario eliminado");

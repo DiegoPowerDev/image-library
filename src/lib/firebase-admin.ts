@@ -14,5 +14,5 @@ if (!admin.apps.length) {
     console.error("Error al inicializar Firebase Admin:", error);
   }
 }
-export const auth = admin.auth();
-export const db = admin.firestore();
+export const adminAuth = admin.auth();
+export const adminDb = admin.firestore();
