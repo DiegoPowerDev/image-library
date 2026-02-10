@@ -114,6 +114,11 @@ export const useUserStore = create<UserState>((set, get) => ({
     try {
       const user = get().users.find((u) => u.id === userId);
       if (!user) throw new Error("Usuario no encontrado");
+      const res = await fetch(`/api/users`, {
+        method: "POST",
+        body: JSON.stringify({ userId: userId }),
+      });
+      console.log(res);
 
       const newStatus = user.status === "active" ? "disabled" : "active";
       const userRef = doc(db, "users", userId);
