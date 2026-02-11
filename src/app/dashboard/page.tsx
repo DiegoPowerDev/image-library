@@ -4,7 +4,7 @@ import Sidebar from "@/components/sidebar/sidebar";
 import { useFireStore } from "@/store/firestore";
 import { useUserStore } from "@/store/userStore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ export default function Page() {
   const uid = useFireStore((s) => s.uid);
   const setUid = useFireStore((s) => s.setUid);
   const router = useRouter();
-
+  const pathname = usePathname();
   useEffect(() => {
     const auth = getAuth();
 
@@ -68,6 +68,12 @@ export default function Page() {
     Biblioteca: <Biblioteca />,
   };
 
+  useEffect(() => {
+    if (sideOption != "Biblioteca") {
+      router.push(`${pathname}`);
+    }
+  }, [sideOption]);
+
   return (
     <>
       {uid && (
@@ -76,7 +82,7 @@ export default function Page() {
           <div
             className={cn(
               menu ? "pl-52" : "pl-16",
-              "h-full w-full flex flex-col",
+              "h-full  w-full flex flex-col max-h-screen",
             )}
           >
             {tables[sideOption]}

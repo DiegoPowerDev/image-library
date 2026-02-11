@@ -29,7 +29,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
 import { cn } from "@/lib/utils";
 import {
   IconTableSpark,
@@ -37,13 +36,11 @@ import {
   IconTrash,
   IconX,
   IconSearch,
-  IconFilter,
   IconHistory,
   IconCheck,
   IconEdit,
-  IconDownload,
 } from "@tabler/icons-react";
-import { DialogClose, DialogTrigger } from "@radix-ui/react-dialog";
+import { DialogClose } from "@radix-ui/react-dialog";
 import { useTareasStore } from "@/store/tareaStore";
 import { useFireStore } from "@/store/firestore";
 import toast from "react-hot-toast";
@@ -360,12 +357,9 @@ export default function Calendario() {
           </div>
 
           {/* Días de la semana */}
-          <div className="h-10 grid grid-cols-7 w-full place-content-center px-12">
+          <div className="h-10 grid grid-cols-7 w-full place-content-center px-12 bg-gray-800">
             {diasSemana.map((d) => (
-              <div
-                key={d}
-                className="h-4 text-center font-semibold text-zinc-400"
-              >
+              <div key={d} className="h-4 text-center font-semibold  ">
                 {d}
               </div>
             ))}

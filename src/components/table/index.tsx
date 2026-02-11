@@ -1,14 +1,27 @@
 "use client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import styles from "@/components/styles.module.css";
-import { useState, useMemo, CSSProperties } from "react";
+import { useMemo, CSSProperties } from "react";
 import Card from "@/components/card/card";
 
 import { useFireStore } from "@/store/firestore";
 import { cn } from "@/lib/utils";
 import { Timestamp } from "firebase/firestore";
 import { useUserStore } from "@/store/userStore";
-import { IconPlus } from "@tabler/icons-react";
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconPlus,
+} from "@tabler/icons-react";
+import { Button } from "../ui/button";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Props {
   newImage?: (value: boolean) => void;
@@ -59,12 +72,32 @@ const meses = [
   "Diciembre",
 ];
 
+const limit = [10, 20, 50, 100];
+
 export default function Table({ newImage, filtros }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const user = useUserStore((s) => s.currentUser);
 
   const sideOption = useFireStore((s) => s.sideOption);
   const items = useFireStore((s) => s.items);
   const isLoadingFromFirestore = useFireStore((s) => s.isLoadingFromFirestore);
+
+  const page = Number(searchParams.get("page")) || 1;
+  const count = Number(searchParams.get("limit")) || 10;
+
+  const updateUrl = (newParams: { page?: number; limit?: number }) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (newParams.page) params.set("page", newParams.page.toString());
+    if (newParams.limit) {
+      params.set("limit", newParams.limit.toString());
+      params.set("page", "1"); // Resetear a pag 1 si cambia el límite
+    }
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   function toDate(fecha: Date | Timestamp | string) {
     if (!fecha) return null;
@@ -130,6 +163,13 @@ export default function Table({ newImage, filtros }: Props) {
     });
   }, [items, sideOption, filtros]);
 
+  const paginatedImages = useMemo<Image[]>(() => {
+    const startIndex = (page - 1) * count;
+    const endIndex = startIndex + count;
+    return filteredImages.slice(startIndex, endIndex);
+  }, [count, page, filteredImages]);
+  const totalPages = Math.ceil(filteredImages.length / count);
+
   return (
     <>
       {isLoadingFromFirestore ? (
@@ -139,37 +179,89 @@ export default function Table({ newImage, filtros }: Props) {
           </div>
         </div>
       ) : (
-        <div
-          style={{ "--theme": "gray" } as CSSProperties}
-          className={cn(
-            styles.scrollContainer,
-            " w-full px-4 flex flex-1 justify-center overflow-y-auto",
-          )}
-        >
-          <div className="h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 grid-flow-row auto-cols-fr gap-4">
-            {user?.role != "viewer" && newImage && (
-              <button
-                onClick={() => newImage(true)}
-                className="border-white/40 border-2 border-dotted hover:border-solid w-64 h-64 rounded flex items-center justify-center transition-all duration-300 cursor-pointer hover:bg-white/5 group"
-              >
-                <IconPlus
-                  color="white"
-                  size={40}
-                  className="group-hover:scale-110 transition-transform"
-                />
-              </button>
-            )}
+        <>
+          <div className=" w-full  flex flex-1 justify-center overflow-hidden">
+            <div
+              style={{ "--theme": "gray" } as CSSProperties}
+              className={cn(
+                styles.scrollContainer,
+                "overflow-y-auto w-full p-4 px-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 grid-flow-row  gap-4",
+              )}
+            >
+              {user?.role != "viewer" && newImage && (
+                <button
+                  onClick={() => newImage(true)}
+                  className="border-white/40 border-2 border-dotted hover:border-solid w-64 h-64 rounded flex items-center justify-center transition-all duration-300 cursor-pointer hover:bg-white/5 group"
+                >
+                  <IconPlus
+                    color="white"
+                    size={40}
+                    className="group-hover:scale-110 transition-transform"
+                  />
+                </button>
+              )}
 
-            {filteredImages.map((e) => (
-              <Card key={e.id} image={e} />
-            ))}
+              {paginatedImages.map((e) => (
+                <Card key={e.id} image={e} />
+              ))}
+            </div>
           </div>
           {filteredImages.length === 0 && sideOption != "Biblioteca" && (
-            <div className="flex-1 w-full h-full text-gray-400 flex justify-center items-center select-none">
+            <div className="  w-full h-full text-gray-400 flex justify-center items-center select-none">
               No se encontró imagenes
             </div>
           )}
-        </div>
+          <div className="w-full h-12 p-4 flex gap-4 items-center font-bold text-white bg-gray-900">
+            <div className="w-full flex justify-center">
+              <div className="flex gap-2 items-center">
+                <label className="text-sm">Cant:</label>
+                <Select
+                  value={count.toString()}
+                  onValueChange={(v) => updateUrl({ limit: Number(v) })}
+                >
+                  <SelectTrigger className="w-[80px] bg-black border-gray-700 text-white h-8 text-sm">
+                    <SelectValue placeholder={count} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {limit.map((e) => (
+                      <SelectItem key={e} value={e.toString()}>
+                        {e}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="w-full flex justify-center">
+              <div className="flex gap-2 items-center">
+                <Button
+                  size="icon"
+                  className="bg-black h-8 w-8 text-white hover:bg-white/10 flex justify-center"
+                  disabled={page <= 1}
+                  onClick={() => updateUrl({ page: page - 1 })}
+                >
+                  <IconChevronLeft size={20} />
+                </Button>
+                <div className="flex justify-center w-48 gap-2">
+                  Página
+                  <div className="bg-black px-3 py-1 rounded text-xs border border-gray-700">
+                    {page || 1}
+                  </div>
+                  de {totalPages}
+                </div>
+                <Button
+                  size="icon"
+                  className="bg-black h-8 w-8 text-white hover:bg-white/10 flex justify-center"
+                  disabled={page >= totalPages}
+                  onClick={() => updateUrl({ page: page + 1 })}
+                >
+                  <IconChevronRight size={20} />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </>
   );

@@ -13,9 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import styles from "@/components/styles.module.css";
-import { useEffect, useRef, useState, useMemo, CSSProperties } from "react";
-import Card from "@/components/card/card";
+import { useEffect, useRef, useState } from "react";
 import {
   IconBrandFacebook,
   IconBrandWordpress,
@@ -31,34 +29,12 @@ import {
   IconSun,
 } from "@tabler/icons-react";
 import { useFireStore } from "@/store/firestore";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { Timestamp } from "firebase/firestore";
-import { useUserStore } from "@/store/userStore";
 import Table from "../table";
 
-interface Image {
-  id: number;
-  nombre: string;
-  url: string;
-  autor: string;
-  fechaModificacion: Date | string;
-  fechaCreacion: Date | string;
-  categoria: string;
-  estado: string;
-  campaña: string;
-  descripcion: string;
-  historial: Array<{
-    id: number;
-    titulo: string;
-    descripcion: string;
-    url: string;
-    autor: string;
-    fechaModificacion: Date | string;
-  }>;
-}
 const año = ["Todos", "2025", "2026", "2027"];
 
 const meses = [
@@ -137,9 +113,7 @@ export default function Biblioteca() {
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [categoria, setCategoria] = useState("ninguna");
-  const [filtroCategoria, setFiltroCategoria] = useState("ninguna");
   const [campaña, setCampaña] = useState("ninguna");
-  const [tipoCampaña, setTipoCampaña] = useState("ninguna");
   const [uploading, setUploading] = useState(false);
 
   // Filtros de biblioteca
@@ -148,18 +122,9 @@ export default function Biblioteca() {
   const [filtroCategoriaLib, setFiltroCategoriaLib] = useState("Todos");
   const [filtroCampaña, setFiltroCampaña] = useState("Todos");
 
-  const sideOption = useFireStore((s) => s.sideOption);
-  const items = useFireStore((s) => s.items);
   const addImagen = useFireStore((s) => s.addImagen);
   const lastId = useFireStore((s) => s.lastId);
   const email = useFireStore((s) => s.email);
-
-  function toDate(fecha: Date | Timestamp | string) {
-    if (!fecha) return null;
-    if (fecha instanceof Date) return fecha;
-    if (fecha instanceof Timestamp) return fecha.toDate();
-    return new Date(fecha);
-  }
 
   const fileRef = useRef<File | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -297,14 +262,6 @@ export default function Biblioteca() {
     return () => window.removeEventListener("paste", handlePaste);
   }, []);
 
-  // Optimizar filtrado con useMemo
-
-  const headerHeight = useMemo(() => {
-    if (sideOption === "campañas") return "h-36";
-    if (sideOption === "Biblioteca") return "h-16";
-    return "h-16";
-  }, [sideOption]);
-
   const filtros = {
     filtroMes,
     filtroAño,
@@ -313,120 +270,84 @@ export default function Biblioteca() {
   };
 
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-4 w-full  items-center transition-all duration-300 h-full",
-      )}
-    >
-      <div
-        className={cn(
-          headerHeight,
-          "sticky w-full bg-black text-white justify-center transition-all duration-300",
-        )}
-      >
-        <div className="h-full flex flex-col w-full gap-2 bg-gray-900 text-white justify-center px-4">
-          {sideOption !== "Biblioteca" && sideOption !== "Eliminados" && (
-            <div className="flex gap-2 w-full justify-center">
-              {seccions.map((e, i) => {
-                const IconComponent = e.Icono;
-                return (
-                  <button
-                    key={i}
-                    onClick={() => setFiltroCategoria(e.nombre)}
-                    className={cn(
-                      filtroCategoria === e.nombre
-                        ? "bg-black border-white border-2"
-                        : "bg-gray-500 hover:bg-gray-600",
-                      "w-32 h-12 rounded text-center flex items-center justify-center transition-all duration-200 cursor-pointer gap-2 uppercase",
-                    )}
+    <>
+      <div className=" flex w-full gap-4 h-16 p-4 bg-gray-900 text-white justify-center px-4">
+        <div className="flex gap-2 items-center">
+          <label htmlFor="meses">Año:</label>
+          <Select value={filtroAño} onValueChange={setFiltroAño}>
+            <SelectTrigger className="  bg-black">
+              <SelectValue placeholder="Mes" />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              {año.map((mes) => (
+                <SelectItem key={mes} value={mes}>
+                  {mes}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex gap-2 items-center">
+          <label htmlFor="meses">Mes:</label>
+          <Select value={filtroMes} onValueChange={setFiltroMes}>
+            <SelectTrigger className="  bg-black">
+              <SelectValue placeholder="Mes" />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              {meses.map((mes) => (
+                <SelectItem key={mes} value={mes}>
+                  {mes}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex gap-2 items-center">
+          <label htmlFor="meses">Categoria:</label>
+          <Select
+            value={filtroCategoriaLib}
+            onValueChange={setFiltroCategoriaLib}
+          >
+            <SelectTrigger className="w-[180px] bg-black">
+              <SelectValue placeholder="Categoría" />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              <SelectItem value="Todos">Todos</SelectItem>
+              {seccions
+                .filter((s) => s.nombre !== "ninguna")
+                .map((s) => (
+                  <SelectItem
+                    key={s.nombre}
+                    value={s.nombre}
+                    className="capitalize"
                   >
-                    {e.nombre}
-                    <IconComponent size={20} />
-                  </button>
-                );
-              })}
-            </div>
-          )}
+                    {s.nombre}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div className="flex gap-8 w-full justify-center items-center ">
-            <div className="flex gap-2 items-center">
-              <label htmlFor="meses">Año:</label>
-              <Select value={filtroAño} onValueChange={setFiltroAño}>
-                <SelectTrigger className="w-[180px] bg-black">
-                  <SelectValue placeholder="Mes" />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  {año.map((mes) => (
-                    <SelectItem key={mes} value={mes}>
-                      {mes}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex gap-2 items-center">
-              <label htmlFor="meses">Mes:</label>
-              <Select value={filtroMes} onValueChange={setFiltroMes}>
-                <SelectTrigger className="w-[180px] bg-black">
-                  <SelectValue placeholder="Mes" />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  {meses.map((mes) => (
-                    <SelectItem key={mes} value={mes}>
-                      {mes}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex gap-2 items-center">
-              <label htmlFor="meses">Categoria:</label>
-              <Select
-                value={filtroCategoriaLib}
-                onValueChange={setFiltroCategoriaLib}
-              >
-                <SelectTrigger className="w-[180px] bg-black">
-                  <SelectValue placeholder="Categoría" />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="Todos">Todos</SelectItem>
-                  {seccions
-                    .filter((s) => s.nombre !== "ninguna")
-                    .map((s) => (
-                      <SelectItem
-                        key={s.nombre}
-                        value={s.nombre}
-                        className="capitalize"
-                      >
-                        {s.nombre}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex gap-2 items-center">
-              <label htmlFor="meses">Campaña:</label>
-              <Select value={filtroCampaña} onValueChange={setFiltroCampaña}>
-                <SelectTrigger className="w-[180px] bg-black bg-black">
-                  <SelectValue placeholder="Campaña" />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="Todos">Todos</SelectItem>
-                  {Campañas.filter((c) => c.nombre !== "ninguna").map((c) => (
-                    <SelectItem
-                      key={c.nombre}
-                      value={c.nombre}
-                      className="capitalize"
-                    >
-                      {c.nombre}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+        <div className="flex gap-2 items-center">
+          <label htmlFor="meses">Campaña:</label>
+          <Select value={filtroCampaña} onValueChange={setFiltroCampaña}>
+            <SelectTrigger className="w-[180px] bg-black bg-black">
+              <SelectValue placeholder="Campaña" />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              <SelectItem value="Todos">Todos</SelectItem>
+              {Campañas.filter((c) => c.nombre !== "ninguna").map((c) => (
+                <SelectItem
+                  key={c.nombre}
+                  value={c.nombre}
+                  className="capitalize"
+                >
+                  {c.nombre}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -533,6 +454,6 @@ export default function Biblioteca() {
           </form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

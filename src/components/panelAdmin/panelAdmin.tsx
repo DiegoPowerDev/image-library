@@ -11,8 +11,8 @@ import BackupPanel from "./backupPanel";
 export default function PanelAdmin() {
   const [tab, setTab] = useState("users");
   return (
-    <div className="w-full h-full  flex flex-col bg-black text-white 2xl:px-40">
-      <div className="flex w-full h-16 items-center p-6 gap-4 bg-gray-900">
+    <div className="w-full h-full  flex flex-col bg-black text-white">
+      <div className="flex w-full h-16 items-center p-6 gap-4 bg-gray-900 ">
         <Button
           variant="ghost"
           onClick={() => setTab("users")}
@@ -41,7 +41,7 @@ export default function PanelAdmin() {
         style={{ "--theme": "gray" } as CSSProperties}
         className={cn(
           styles.scrollContainer,
-          "flex-1 w-full overflow-y-auto p-8",
+          "flex-1 w-full overflow-y-auto p-8  2xl:px-40",
         )}
       >
         {tab === "users" ? <UserAdminPanel /> : <BackupPanel />}
