@@ -49,7 +49,7 @@ import { useFireStore } from "@/store/firestore";
 import toast from "react-hot-toast";
 import Card from "../card/card";
 
-const años = [2026];
+const años = ["2025", "2026", "2027"];
 
 const meses = [
   "Enero",
@@ -376,7 +376,7 @@ export default function Calendario() {
             style={{ "--theme": "gray" } as CSSProperties}
             className={cn(
               styles.scrollContainer,
-              "grid grid-cols-7 flex-1 w-full overflow-y-auto px-12",
+              "grid grid-cols-7 flex-1 w-full overflow-y-auto px-12 py-4",
             )}
           >
             {/* Espacios vacíos */}

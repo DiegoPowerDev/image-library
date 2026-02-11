@@ -55,7 +55,6 @@ import { useUserStore } from "@/store/userStore";
 interface User {
   id: string;
   email: string;
-  area: string;
   displayName: string;
   role: "admin" | "editor" | "viewer";
   status: "active" | "disabled";
@@ -142,7 +141,7 @@ export default function UserAdminPanel() {
 
   const createNewUser = async () => {
     try {
-      await createUser(newEmail, newPassword, newName, newRole, newArea);
+      await createUser(newEmail, newPassword, newName, newRole);
       toast.success("Usuario creado");
       setCreateDialog(false);
     } catch (error) {
@@ -445,17 +444,6 @@ export default function UserAdminPanel() {
 
             <div className="flex gap-2 w-full justify-center">
               <div className="flex flex-col  gap-2">
-                <span className="flex items-center">
-                  <b>Area: </b>
-                </span>
-                <Input
-                  value={newArea}
-                  onChange={(e) => setNewArea(e.target.value)}
-                  placeholder={selectedUser?.area}
-                  className="uppercase"
-                />
-              </div>
-              <div className="flex flex-col  gap-2">
                 <label className="flex items-center">Rol</label>
                 <Select
                   value={newRole}
@@ -466,7 +454,7 @@ export default function UserAdminPanel() {
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar rol" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper">
                     <SelectItem value="admin">
                       <div className="flex items-center gap-2">
                         <IconShield size={16} />
@@ -526,12 +514,6 @@ export default function UserAdminPanel() {
                 onChange={(e) => setNombre(e.target.value)}
               />
             </div>
-            <div className="flex gap-2">
-              <span className="flex items-center">
-                <b>Area: </b>
-              </span>
-              <Input placeholder={selectedUser?.area} className="uppercase" />
-            </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Rol</label>
@@ -544,7 +526,7 @@ export default function UserAdminPanel() {
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar rol" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper">
                   <SelectItem value="admin">
                     <div className="flex items-center gap-2">
                       <IconShield size={16} />

@@ -59,6 +59,7 @@ interface Image {
     fechaModificacion: Date | string;
   }>;
 }
+const año = ["Todos", "2025", "2026", "2027"];
 
 const meses = [
   "Todos",
@@ -348,6 +349,21 @@ export default function Biblioteca() {
           )}
 
           <div className="flex gap-8 w-full justify-center items-center ">
+            <div className="flex gap-2 items-center">
+              <label htmlFor="meses">Año:</label>
+              <Select value={filtroAño} onValueChange={setFiltroAño}>
+                <SelectTrigger className="w-[180px] bg-black">
+                  <SelectValue placeholder="Mes" />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  {año.map((mes) => (
+                    <SelectItem key={mes} value={mes}>
+                      {mes}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="flex gap-2 items-center">
               <label htmlFor="meses">Mes:</label>
               <Select value={filtroMes} onValueChange={setFiltroMes}>

@@ -20,7 +20,6 @@ interface User {
   id: string;
   email: string;
   displayName: string;
-  area: string;
   role: "admin" | "editor" | "viewer";
   status: "active" | "disabled";
   createdAt: Date;
@@ -37,7 +36,6 @@ interface UserState {
     password: string,
     displayName: string,
     rol: "admin" | "editor" | "viewer",
-    area: string,
   ) => Promise<{ success: boolean }>;
   updateUser: (
     userId: string,
@@ -70,7 +68,6 @@ export const useUserStore = create<UserState>((set, get) => ({
           usersData.push({
             id: doc.id,
             email: data.email,
-            area: data.area || "ninguna",
             displayName: data.displayName || data.email,
             role: data.role || "viewer",
             status: data.status || "active",
@@ -92,7 +89,7 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     return unsubscribe;
   },
-  createUser: async (email, password, displayName, rol, area) => {
+  createUser: async (email, password, displayName, rol) => {
     try {
       const res = await fetch("/api/create-users", {
         method: "POST",
@@ -106,11 +103,9 @@ export const useUserStore = create<UserState>((set, get) => ({
       const { uid } = await res.json();
       const userRef = doc(db, "users", uid);
       const userData = {
-        id: uid,
         email,
         displayName: displayName || email.split("@")[0],
         role: rol || "viewer",
-        area: area || "administrativo",
         status: "active",
         createdAt: new Date(),
         lastLogin: null,
