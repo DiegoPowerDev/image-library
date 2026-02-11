@@ -19,6 +19,7 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { UserRoundX } from "lucide-react";
+import Image from "next/image";
 
 export default function Sidebar() {
   const user = useUserStore((s) => s.currentUser);
@@ -33,29 +34,41 @@ export default function Sidebar() {
     <div
       className={cn(
         menu ? "w-52" : "w-16",
-        "h-screen transition-all ease-out duration-200 z-20 left-0 top-0 fixed flex flex-col justify-between text-white bg-gray-900",
+        "border-r border-gray-700 h-screen transition-all ease-out duration-200 z-20 left-0 top-0 fixed flex flex-col justify-between text-white bg-gray-900",
       )}
     >
-      <div
-        className={cn(
-          !menu && "justify-center",
-          "bg-gray-500 truncate  hover:bg-gray-700 text-white h-16 items-center p-4 w-full font-bold flex gap-2 duration-200 cursor-pointer",
-        )}
-      >
-        <div
-          onClick={() => {
-            logout();
-            setUid(null);
-          }}
-          className="hover:scale-125 duration-200"
-        >
-          <IconDoor size={30} />
+      <div>
+        <div className="h-16 flex justify-center items-center gap-2 font-bold">
+          <Image
+            alt="logo"
+            src="/logo3.webp"
+            width={50}
+            height={50}
+            className="object-contain max-w-full"
+          />
+          {menu && "Image Library"}
         </div>
-        {menu &&
-          `Hola ${
-            user?.displayName.toUpperCase() ||
-            email?.slice(0, email.indexOf("@"))
-          }`}
+        <div
+          className={cn(
+            !menu && "justify-center",
+            "bg-gray-500 truncate  hover:bg-gray-700 text-white h-16 items-center p-4 w-full font-bold flex gap-2 duration-200 cursor-pointer",
+          )}
+        >
+          <div
+            onClick={() => {
+              logout();
+              setUid(null);
+            }}
+            className="hover:scale-125 duration-200"
+          >
+            <IconDoor size={30} />
+          </div>
+          {menu &&
+            `Hola ${
+              user?.displayName.toUpperCase() ||
+              email?.slice(0, email.indexOf("@"))
+            }`}
+        </div>
       </div>
       <div>
         <div className="flex flex-col items-center justify-center  overflow-hidden">
@@ -88,17 +101,17 @@ export default function Sidebar() {
           </div>
 
           <div
-            onClick={() => setSideOption("Eliminados")}
+            onClick={() => setSideOption("Papelera")}
             className={cn(
               !menu && "justify-center",
-              sideOption === "Eliminados"
+              sideOption === "Papelera"
                 ? "bg-black "
                 : "bg-gray-500 hover:bg-gray-700",
               "text-white truncate max-h-16 items-center p-4 w-full font-bold flex gap-2 duration-200 cursor-pointer",
             )}
           >
             <IconTrash size={30} />
-            {menu && "Eliminados"}
+            {menu && "Papelera"}
           </div>
           {user?.role === "admin" && (
             <>

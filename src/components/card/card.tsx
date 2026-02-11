@@ -423,7 +423,7 @@ export default function Card(props: Props) {
                         <div
                           onClick={() => {
                             if (image.estado === "activo") {
-                              toast.success("Imagen eliminada");
+                              toast.success("Imagen enviada a la papelera");
                               return deleteImagen(image.id);
                             }
                             if (image.estado === "eliminado") {

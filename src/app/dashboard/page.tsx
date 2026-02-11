@@ -64,7 +64,7 @@ export default function Page() {
   const tables: Record<string, React.ReactElement> = {
     Calendario: <Calendario />,
     Panel: <PanelAdmin />,
-    Eliminados: <Eliminados />,
+    Papelera: <Eliminados />,
     Biblioteca: <Biblioteca />,
   };
 

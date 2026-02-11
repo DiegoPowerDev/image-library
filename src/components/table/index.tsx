@@ -111,7 +111,7 @@ export default function Table({ newImage, filtros }: Props) {
       const fecha = toDate(img.fechaCreacion);
       if (!fecha) return false;
 
-      if (sideOption === "Eliminados") {
+      if (sideOption === "Papelera") {
         return img.estado === "eliminado";
       }
 
@@ -185,7 +185,7 @@ export default function Table({ newImage, filtros }: Props) {
               style={{ "--theme": "gray" } as CSSProperties}
               className={cn(
                 styles.scrollContainer,
-                "overflow-y-auto w-full p-4 px-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 grid-flow-row  gap-4",
+                "overflow-y-auto w-full p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 grid-flow-row  gap-4",
               )}
             >
               {user?.role != "viewer" && newImage && (
