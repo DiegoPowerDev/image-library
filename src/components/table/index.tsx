@@ -183,27 +183,30 @@ export default function Table({ newImage, filtros }: Props) {
           <div className=" w-full  flex flex-1 justify-center overflow-hidden">
             <div
               style={{ "--theme": "gray" } as CSSProperties}
-              className={cn(
-                styles.scrollContainer,
-                "overflow-y-auto w-full p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 grid-flow-row  gap-4",
-              )}
+              className={cn(styles.scrollContainer, "overflow-y-auto w-full")}
             >
-              {user?.role != "viewer" && newImage && (
-                <button
-                  onClick={() => newImage(true)}
-                  className="border-white/40 border-2 border-dotted hover:border-solid w-64 h-64 rounded flex items-center justify-center transition-all duration-300 cursor-pointer hover:bg-white/5 group"
-                >
-                  <IconPlus
-                    color="white"
-                    size={40}
-                    className="group-hover:scale-110 transition-transform"
-                  />
-                </button>
-              )}
+              <div
+                className={cn(
+                  "  w-full p-4 grid h-fit  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 grid-flow-row  gap-4",
+                )}
+              >
+                {user?.role != "viewer" && newImage && (
+                  <button
+                    onClick={() => newImage(true)}
+                    className="border-white/40 border-2 border-dotted hover:border-solid w-64 h-64 rounded flex items-center justify-center transition-all duration-300 cursor-pointer hover:bg-white/5 group"
+                  >
+                    <IconPlus
+                      color="white"
+                      size={40}
+                      className="group-hover:scale-110 transition-transform"
+                    />
+                  </button>
+                )}
 
-              {paginatedImages.map((e) => (
-                <Card key={e.id} image={e} />
-              ))}
+                {paginatedImages.map((e) => (
+                  <Card key={e.id} image={e} />
+                ))}
+              </div>
             </div>
           </div>
           {filteredImages.length === 0 && sideOption != "Biblioteca" && (
